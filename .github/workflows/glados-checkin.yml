@@ -1,39 +1,36 @@
-# GlaDOS自动签到工作流
 name: GlaDOS Auto Checkin
 
 # 触发规则：定时+手动
 on:
   schedule:
-    - cron: '10 0 * * *'  # UTC00:10 → 北京时间8:10，分 时 日 月 周
-  workflow_dispatch:  # 手动触发开关
+    - cron: '10 0 * * *'  # UTC00:10 → 北京时间8:10
+  workflow_dispatch:  # 手动触发
 
-# 工作流权限（强制指定读写，覆盖仓库全局设置，核心！）
+# 强制指定读写权限
 permissions:
   contents: write
-  issues: write
-  pull-requests: write
 
-# 运行任务
 jobs:
   checkin:
-    # 运行环境（轻量ubuntu，加快执行）
     runs-on: ubuntu-latest
-    # 执行步骤
     steps:
       - name: 拉取仓库代码
         uses: actions/checkout@v4
+        # 确保拉取主分支最新代码
+        with:
+          ref: main
 
       - name: 配置Python环境
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'  # 适配签到脚本的Python版本
-          cache: 'pip'  # 缓存pip，加快执行
+          python-version: '3.10'
+          # 关键：关闭pip缓存检测，避免查找requirements.txt
+          cache: ''
 
-      - name: 安装依赖
-        run: pip install requests  # 仅安装签到脚本需要的requests
+      - name: 安装依赖（仅requests）
+        run: pip install requests --upgrade
 
       - name: 执行签到脚本
         run: python glados_checkin.py
-        # 传入Cookie环境变量（和你Secrets里的名称一致）
         env:
           GLADOS_COOKIE: ${{ secrets.GLADOS_COOKIE }}
