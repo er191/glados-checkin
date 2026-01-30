@@ -3,7 +3,8 @@ name: GlaDOS Auto Checkin
 # 触发规则：定时+手动
 on:
   schedule:
-    - cron: '10 0 * * *'  # UTC00:10 → 北京时间8:10
+    - cron: '0 0 * * *'  # UTC00:00 → 北京时间8:00
+    - cron: '0 8 * * *'   # UTC08:00 → 北京时间16:00
   workflow_dispatch:  # 手动触发
 
 # 强制指定读写权限
